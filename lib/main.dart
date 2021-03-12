@@ -21,6 +21,7 @@ Future<void> main() async {
   Hive.init(directory.path);
 
   await Hive.openBox('pdfs');
+  await Hive.openBox('starred');
   Hive.registerAdapter(UserPreferencesAdapter());
   final res = await Hive.openBox('preferences');
 
@@ -39,6 +40,14 @@ Future<void> main() async {
     final r = res.getAt(0);
   } on RangeError catch (e) {
     final res = await Hive.box('pdfs');
+    final r = res.add([]);
+  }
+
+  try {
+    final res = await Hive.box('starred');
+    final r = res.getAt(0);
+  } on RangeError catch (e) {
+    final res = await Hive.box('starred');
     final r = res.add([]);
   }
 
@@ -97,8 +106,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-
-    // <<<<<<< HEAD
     return ChangeNotifierProvider(
         create: (_) {
           return themeChangeProvider;
@@ -144,9 +151,12 @@ class _MyAppState extends State<MyApp> {
                                       ),
                                     ),
                                     image: Align(
-                                      child: Image.asset(
-                                          'assets/images/logo.png',
-                                          width: 350.0),
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
+                                        child: SvgPicture.asset(
+                                            'assets/images/doclenselight.svg',
+                                            width: 350.0),
+                                      ),
                                       alignment: Alignment.bottomCenter,
                                     )
                                 ),
@@ -173,16 +183,22 @@ class _MyAppState extends State<MyApp> {
                               ],
                               onDone: () {
                                 setFirstTime();
-                                Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) => Home()
+                                Navigator.pushReplacement(context, PageRouteBuilder(
+                                  pageBuilder: (c, a1, a2) => Home(),
+                                  transitionsBuilder: (c, anim, a2, child) =>
+                                      FadeTransition(opacity: anim, child: child),
+                                  // transitionDuration: Duration(milliseconds: 1000),
                                 ));
                               },
                               showSkipButton: true,
                               skip: Text("Skip"),
                               onSkip: () {
                                 setFirstTime();
-                                Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) => Home()
+                                Navigator.pushReplacement(context, PageRouteBuilder(
+                                  pageBuilder: (c, a1, a2) => Home(),
+                                  transitionsBuilder: (c, anim, a2, child) =>
+                                      FadeTransition(opacity: anim, child: child),
+                                  // transitionDuration: Duration(milliseconds: 1000),
                                 ));
                               },
                               done: const Text('Done', style: TextStyle(
@@ -203,81 +219,6 @@ class _MyAppState extends State<MyApp> {
             );
           },
         )
-// =======
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       home: AnimatedSplashScreen(
-//         splash: Image.asset('assets/images/logos.png'),
-//         nextScreen: FutureBuilder(
-//           future: checkFirstTime(),
-//           builder: (context, snapshot) {
-//             if(snapshot.hasData) {
-//               if(snapshot.data == false) {
-//                 return Home();
-//               } else return IntroductionScreen(
-//                   pages: [
-//                     PageViewModel(
-//                       title: "",
-//                       bodyWidget: Center(
-//                         child: Text(
-//                           "An App made in 🇮🇳 with ❤️",
-//                           style: TextStyle(
-//                             fontSize: 25,
-//                             fontWeight: FontWeight.bold
-//                           ),
-//                         ),
-//                       ),
-//                       image: Align(
-//                         child: Image.asset('assets/images/logo.png', width: 350.0),
-//                         alignment: Alignment.bottomCenter,
-//                       )
-//                     ),
-//
-//                     PageViewModel(
-//                         title: "",
-//                         bodyWidget: Center(
-//                           child: Text(
-//                             "Scan Your Favourite Documents or Assignments on the go!!",
-//                             textAlign: TextAlign.center,
-//                             style: TextStyle(
-//                                 fontSize: 25,
-//                                 fontWeight: FontWeight.bold
-//                             ),
-//                           ),
-//                         ),
-//                         image: Align(
-//                           child: Image.asset('assets/images/scan.jpg', width: 350.0),
-//                           alignment: Alignment.bottomCenter,
-//                         )
-//                     )
-//                   ],
-//                   onDone: () {
-//                     setFirstTime();
-//                     Navigator.push(context, MaterialPageRoute(
-//                         builder: (context)=>Home()
-//                     ));
-//                   },
-//                 showSkipButton: true,
-//                 skip: Text("Skip"),
-//                 onSkip: () {
-//                     setFirstTime();
-//                     Navigator.push(context, MaterialPageRoute(
-//                         builder: (context)=>Home()
-//                     ));
-//                 },
-//                 done: const Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
-//               );
-//             } else {
-//               return Center(
-//                 child: CircularProgressIndicator(),
-//               );
-//             }
-//           }
-//         ),
-//         splashTransition: SplashTransition.rotationTransition,
-//         duration: 4000,
-//       ),
-// >>>>>>> fd9eeeeeab88aec15f35f198b41efb63632d90a2
     );
   }
 }
